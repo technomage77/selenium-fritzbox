@@ -41,26 +41,38 @@ Zielbild:
 - Node.js LTS installieren (z.B. via `nvm`):  
   - `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash`  
   - Terminal neu laden, dann: `nvm install --lts`  
-  - Prüfen: `node -v`, `npm -v # use pnpm`  
+  - Prüfen: `node -v  # print v24.13.0`, `npm -v # print v11.6.2; use pnpm`  
 
 Optional: `pnpm` installieren, wenn du das bevorzugst: 
 ```bash
 # based at https://www.perplexity.ai/search/fokus-auf-barrierefreiheit-wca-aI8hBWyuRyiVXDMmVXP1gw?sm=d#4
 # 1. pnpm installieren (Ubuntu)
-curl -fsSL https://get.pnpm.io/install.sh | sh -
-# oder: npm install -g pnpm
-pnpm -v
+npm install -g npm@11.8.0 # update befor npm v11.6.2
+npm install -g pnpm
+# oder: curl -fsSL https://get.pnpm.io/install.sh | sh -
+pnpm -v # print v10.28.2
 
 # 2. Core-Vorteile für Tests nutzen
-pnpm init
-pnpm add -D @playwright/test @axe-core/playwright typescript
-pnpm add -D selenium-webdriver @types/selenium-webdriver
+pnpm init -y
+#pnpm add -D @playwright/test @axe-core/playwright typescript
+#pnpm add -D selenium-webdriver @types/selenium-webdriver
+#pnpm dlx playwright install
+
+# based at part 'Konkrete Einrichtung für dich'
+# 3. Deine Test-Deps (schnell!)
+pnpm add -D @playwright/test @axe-core/playwright \
+  selenium-webdriver @types/selenium-webdriver \
+  typescript tsx dotenv
+
+# 4. Browser & Start
 pnpm dlx playwright install
+pnpm run env:init  # Erstellt .env.development; ** ERR_PNPM_NO_SCRIPT  Missing script: env:init
 ```
 
-### 2. Projekt initialisieren
+### 2. Projekt initialisieren (npm)
 ```bash
-mkdir ui-tests && cd $_
+mkdir selenium-fritzbox && cd $_
+# oder: git clone https://github.com/technomage77/selenium-fritzbox.git && cd selenium-fritzbox/
 npm init -y
 npm install --save-dev typescript ts-node @types/node
 npx tsc --init
