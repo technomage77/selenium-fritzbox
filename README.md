@@ -66,6 +66,8 @@ pnpm add -D @playwright/test @axe-core/playwright \
 
 # 4. Browser & Start
 pnpm dlx playwright install
+npx tsc --init  # Erstellt Standard-Vorlage
+find . -name tsconfig.json
 pnpm run env:init  # Erstellt .env.development; ** ERR_PNPM_NO_SCRIPT  Missing script: env:init
 ```
 
@@ -98,16 +100,16 @@ Wichtige TS‑Compiler‑Optionen im `tsconfig.json` (vereinfacht):
 
 ### 3. Playwright mit Test Runner installieren
 ```bash
-npm install --save-dev @playwright/test
-npx playwright install
+pnpm install --save-dev @playwright/test
+pnpx playwright install
 ```
 
-- `npx playwright install` lädt die Browser (Chromium, Firefox, WebKit) und richtet die Binaries ein.  
-- Optional: `npx playwright install-deps`, wenn dir System‑Dependencies fehlen (auf cleanem Server sinnvoll).
+- `pnpx playwright install` lädt die Browser (Chromium, Firefox, WebKit) und richtet die Binaries ein.  
+- `npx playwright install-deps`, wenn dir System‑Dependencies fehlen (auf cleanem Server sinnvoll).
 
 Konfigurationsdatei erzeugen:
 ```bash
-npx playwright init
+pnpx playwright init  # error: unknown command 'init'
 ```
 
 Das legt u.a. an:
