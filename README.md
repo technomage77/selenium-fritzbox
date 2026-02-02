@@ -187,22 +187,69 @@ Browser‑Treiber:
 
 ### 2. Einfacher Selenium‑Test in TypeScript
 
+**`scripts/fritzbox.selenium.ts`**
 ```ts
 import { Builder, By, Key, until } from 'selenium-webdriver';
+import * as chrome from 'selenium-webdriver/chrome.js';
+import fs from "fs";
 
-async function loginTest() {
-  const driver = await new Builder().forBrowser('chrome').build();
+// based at https://www.perplexity.ai/search/hallo-thema-playwright-umgebun-o95aEGP6TAa73NOcTgCSCw#0
+const BASE_URL = process.env.BASE_URL ?? 'http://fritz.box';
+
+async function fritzboxLoginTest() {
+  // Chrome mit lokaler IP (kein Headless für Sichtbarkeit)
+  const options = new chrome.Options();
+  options.addArguments('--disable-web-security'); // Fritz!Box CORS
+
+  const driver = await new Builder()
+    .forBrowser('chrome')
+    .setChromeOptions(options)
+    .build();
+
   try {
-    await driver.get('https://deine-app.example/login');
-    await driver.findElement(By.id('email')).sendKeys('user@example.com');
-    await driver.findElement(By.id('password')).sendKeys('geheim123', Key.RETURN);
-    await driver.wait(until.urlContains('dashboard'), 10000);
+    // Navigate to a URL
+    await driver.get(BASE_URL);
+    console.log("Navigated to Fritz!Box");
+
+    // Sprache auf Deutsch (falls nötig)
+    const langSelect = await driver.wait(
+      until.elementLocated(By.css('#language_select')), 5000
+    );
+    await langSelect.click();
+    await driver.findElement(By.css('option[value="deutsch"]')).click();
+    console.log("Select language german");
+
+    // Login-Feld (Fritz!Box 7.x/FRITZ!OS 7.5+)
+    const usernameField = await driver.wait(
+      until.elementLocated(By.name('username')), 10000
+    );
+    await usernameField.sendKeys(FRITZ_USER); // Aus config!
+
+    const passwordField = driver.findElement(By.name('password'));
+    await passwordField.sendKeys(FRITZ_PASS, Key.RETURN);
+
+    // Erfolgreichen Login prüfen (Dashboard oder Übersicht)
+    await driver.wait(until.elementLocated(By.id('main_content')), 10000);
+    const overviewTitle = await driver.findElement(By.css('h1'));
+    const titleText = await overviewTitle.getText();
+    console.log('Dashboard-Titel:', titleText);
+
+  } catch (error) {
+    console.error('Login-Test fehlgeschlagen:', error);
   } finally {
+    // based at https://www.hyperbrowser.ai/docs/sessions/selenium
+    // Screenshot
+    await driver.takeScreenshot().then((data) => {
+      fs.writeFileSync("last_view_results.png", data, "base64");
+    });
+    console.log("Screenshot saved");
+
     await driver.quit();
+    await client.sessions.stop(session.id);
   }
 }
 
-loginTest();
+fritzboxLoginTest();
 ```
 
 Für WCAG/Usability‑Checks müsstest du hier eher extern integrieren (z.B. `axe-core` via `executeScript` in der Seite ausführen) oder z.B. ein Node‑Script schreiben, das HTML‑Snapshots an Axe übergibt. Das ist deutlich mehr Handarbeit als bei Playwright.
