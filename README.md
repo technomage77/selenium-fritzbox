@@ -58,14 +58,14 @@ pnpm init -y
 #pnpm add -D selenium-webdriver @types/selenium-webdriver
 #pnpm dlx playwright install
 
-# based at part 'Konkrete Einrichtung für dich'
+# based at part 'Konkrete Einrichtung für dich' und [Konfiguration mit 'cross-env dotenv'](https://www.perplexity.ai/search/hallo-thema-playwright-umgebun-o95aEGP6TAa73NOcTgCSCw#2)
 # 3. Deine Test-Deps (schnell!)
 pnpm add -D @playwright/test @axe-core/playwright \
-  selenium-webdriver @types/selenium-webdriver \
-  typescript tsx dotenv
+  selenium-webdriver @types/selenium-webdriver @types/node \
+  typescript tsx cross-env dotenv
+pnpm dlx playwright install --with-deps
 
 # 4. Browser & Start
-pnpm dlx playwright install
 npx tsc --init  # Erstellt Standard-Vorlage
 find . -name tsconfig.json
 pnpm run env:init  # Erstellt .env.development; ** ERR_PNPM_NO_SCRIPT  Missing script: env:init
@@ -206,6 +206,24 @@ loginTest();
 ```
 
 Für WCAG/Usability‑Checks müsstest du hier eher extern integrieren (z.B. `axe-core` via `executeScript` in der Seite ausführen) oder z.B. ein Node‑Script schreiben, das HTML‑Snapshots an Axe übergibt. Das ist deutlich mehr Handarbeit als bei Playwright.
+
+***
+
+## Selenium-Suite ausführen
+
+```bash
+pnpm env:init  # create '.env.development'
+BASE_URL=http://192.168.77.2 pnpm exec tsx scripts/fritzbox.selenium.ts  #passed
+
+DOTENV_CONFIG_PATH=.env.development pnpm exec tsx scripts/fritzbox.selenium.ts  #failed
+DOTENV_CONFIG_PATH=.env.development pnpm exec tsx scripts/fritzbox.selenium.ts --trace on
+NODE_ENV=dev DOTENV_CONFIG_PATH=.env.development pnpm exec tsx scripts/fritzbox.selenium.ts
+
+TEST_ENV=test pnpm test  # start 'pnpm run test:dev && pnpm run test:selenium' see 'package.json'
+TEST_ENV=development pnpm playwright test
+TEST_ENV=development pnpm playwright test --debug
+pnpm exec playwright show-report
+```
 
 ***
 
