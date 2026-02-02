@@ -262,13 +262,18 @@ Für WCAG/Usability‑Checks müsstest du hier eher extern integrieren (z.B. `ax
 pnpm env:init  # create '.env.development'
 BASE_URL=http://192.168.77.2 pnpm exec tsx scripts/fritzbox.selenium.ts  #passed
 
-DOTENV_CONFIG_PATH=.env.development pnpm exec tsx scripts/fritzbox.selenium.ts  #failed
-DOTENV_CONFIG_PATH=.env.development pnpm exec tsx scripts/fritzbox.selenium.ts --trace on
-NODE_ENV=dev DOTENV_CONFIG_PATH=.env.development pnpm exec tsx scripts/fritzbox.selenium.ts
+DOTENV_CONFIG_PATH=.env.development pnpm exec tsx scripts/fritzbox.selenium.ts
+pnpm exec tsx scripts/fritzbox.selenium.ts --trace on
+pnpm exec tsx scripts/fritzbox.selenium.ts
 
-TEST_ENV=test pnpm test  # start 'pnpm run test:dev && pnpm run test:selenium' see 'package.json'
+pnpm test  # start 'pnpm run test:dev && pnpm run test:selenium' see 'package.json'
 TEST_ENV=development pnpm playwright test
-TEST_ENV=development pnpm playwright test --debug
+pnpm playwright test
+pnpm playwright test --debug
+
+pnpm test
+pnpm run test:selenium
+
 pnpm exec playwright show-report
 ```
 
