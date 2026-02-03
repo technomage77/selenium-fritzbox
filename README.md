@@ -245,7 +245,6 @@ async function fritzboxLoginTest() {
     console.log("Screenshot saved");
 
     await driver.quit();
-    await client.sessions.stop(session.id);
   }
 }
 
@@ -257,6 +256,60 @@ Für WCAG/Usability‑Checks müsstest du hier eher extern integrieren (z.B. `ax
 ***
 
 ## Selenium-Suite ausführen
+
+### 1. Konfiguration für Testumgebungen (`dotenv`, ``)
+
+Die produktive Konfiguration in der ENV-Datei '.env' ist geheim und wird folglich nicht im Git eingecheckt. Je nach Testumgebung (z.B. 'DEV', 'TEST', 'STAGE', 'PROD') wird eine passende Version '.env.[enviroment]' auf diese ENV-Datei '.env' dynamisch gemappt. In der Datei '.env.example' werden typische Beispiele aufgeführt, die fachlich natürlich nicht funktionieren, deshalb muss beim Anlegen des Projektes lokal auf diesem System der Befehl `pnpm env:init` ausgeführt werden. Dafür sollte man in der `package.json` im Bereich `scripts` folgendes konfigurieren: 
+
+**`package.json` (Ausschnitt)**
+
+```json
+{
+(..)
+  "scripts": {
+    "env:init": "cp .env.example .env.development && echo '✅ .env.development ready'",
+    "test": "pnpm run test:dev && pnpm run test:selenium",
+    "test:dev": "TEST_ENV=development pnpm playwright test",
+    "test:test": "TEST_ENV=test pnpm playwright test",
+    "test:stage": "TEST_ENV=stage pnpm playwright test",
+    "test:prod": "TEST_ENV=prod pnpm playwright test",
+    "test:selenium": "tsx scripts/fritzbox.selenium.ts",
+    "test:headed": "TEST_ENV=test pnpm playwright test --headed",
+    "test:ui": "TEST_ENV=test pnpm playwright test --ui",
+    "debug": "DEBUG=pw:api TEST_ENV=development pnpm playwright test --debug"
+  },
+(..)
+}
+```
+
+Laut `dotenv`-Framework soll die OS-Umgebungsvariable `TEST_ENV` immer ausgewertet und mit der Funktion `dotenv.config()` geladen werden:   
+
+**`config/load-env.ts`**
+
+```ts
+import dotenv from "dotenv";
+import path from "path";
+
+const explicitPath = process.env.DOTENV_CONFIG_PATH;
+const env = process.env.TEST_ENV || process.env.NODE_ENV || "development";
+
+const envPath =
+  explicitPath
+    ? path.resolve(process.cwd(), explicitPath)
+    : path.resolve(process.cwd(), `.env.${env}`);
+
+const result = dotenv.config({ path: envPath, override: true });
+
+if (result.error) {
+  console.warn(`[env] Keine .env-Datei geladen (${envPath})`);
+} else {
+  console.log(`[env] Environment geladen aus ${envPath}`);
+}
+
+export {};
+```
+
+### 2. Praktische Befehle
 
 ```bash
 pnpm env:init  # create '.env.development'
