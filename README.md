@@ -327,7 +327,6 @@ pnpm env:init  # create '.env.development'
 BASE_URL=http://192.168.77.2 pnpm exec tsx scripts/fritzbox.selenium.ts  #passed
 
 DOTENV_CONFIG_PATH=.env.development pnpm exec tsx scripts/fritzbox.selenium.ts
-pnpm exec tsx scripts/fritzbox.selenium.ts --trace on
 pnpm exec tsx scripts/fritzbox.selenium.ts
 
 pnpm test  # start 'pnpm run test:dev && pnpm run test:selenium' see 'package.json'
