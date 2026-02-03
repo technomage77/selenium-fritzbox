@@ -267,7 +267,7 @@ Die produktive Konfiguration in der ENV-Datei '.env' ist geheim und wird folglic
 {
 (..)
   "scripts": {
-    "env:init": "cp .env.example .env.development && echo '✅ .env.development ready'",
+    "env:init": "cp -n .env.example .env.development && echo '✅ .env.development ready'",
     "test": "pnpm run test:dev && pnpm run test:selenium",
     "test:dev": "TEST_ENV=development pnpm playwright test",
     "test:test": "TEST_ENV=test pnpm playwright test",
@@ -280,6 +280,17 @@ Die produktive Konfiguration in der ENV-Datei '.env' ist geheim und wird folglic
   },
 (..)
 }
+```
+
+Somit sind in der `.gitignore` folgende Einträge sinnvoll:
+
+**`.gitignore`**
+
+```txt
+# dotenv environment variable files
+.env
+.env.*
+!.env.example
 ```
 
 Laut `dotenv`-Framework soll die OS-Umgebungsvariable `TEST_ENV` immer ausgewertet und mit der Funktion `dotenv.config()` geladen werden:   
